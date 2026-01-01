@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const Footer: React.FC = () => (
-  <footer className="mt-32 pb-12 border-t border-zinc-500/10 pt-16 px-8">
+  <footer className="mt-32 pb-32 md:pb-12 border-t border-zinc-500/10 pt-16 px-8">
     <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 text-inherit">
       <div className="col-span-1 md:col-span-2 space-y-4">
         <div className="flex items-center gap-3">
@@ -25,6 +25,7 @@ export const Footer: React.FC = () => (
         <ul className="text-sm space-y-2 text-zinc-500">
           <li>&copy; 2025 PromptArch</li>
           <li>All Rights Reserved.</li>
+          <li><a href="https://shivsrijit.vercel.app" className="hover:text-accent-lavender transition-colors">Shiv Productions</a></li>
           <li>Using Gemini NanoBanana</li>
         </ul>
       </div>
