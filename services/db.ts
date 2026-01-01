@@ -2,14 +2,6 @@
 import { supabase } from './supabase';
 import { SavedPrompt, PublicPrompt } from "../types";
 
-// Helper to handle Supabase type strictness for IDs
-// If the ID is numeric (e.g. "12"), it converts to number. 
-// If it's a UUID (e.g. "abc-123"), it remains a string.
-const formatId = (id: string) => {
-  const numeric = Number(id);
-  return isNaN(numeric) ? id : numeric;
-};
-
 export const db = {
   async fetchCommunityPrompts(): Promise<PublicPrompt[]> {
     const { data, error } = await supabase
@@ -19,7 +11,7 @@ export const db = {
       .order('likes', { ascending: false });
 
     if (error) {
-      console.error('Error fetching community prompts:', error);
+      console.error('Error fetching community prompts:', error.message || error);
       return [];
     }
 
@@ -34,51 +26,50 @@ export const db = {
   },
 
   async toggleLikePrompt(id: string, increment: boolean): Promise<number> {
-    const cleanId = formatId(id);
-    
-    const { data: existing } = await supabase
+    // We use the ID as a string directly to prevent precision loss on large bigints
+    const { data: existing, error: fetchError } = await supabase
       .from('prompts')
       .select('likes')
-      .eq('id', cleanId)
+      .eq('id', id)
       .single();
+
+    if (fetchError) throw fetchError;
 
     const currentLikes = existing?.likes || 0;
     const newLikes = increment ? currentLikes + 1 : Math.max(0, currentLikes - 1);
     
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from('prompts')
       .update({ likes: newLikes })
-      .eq('id', cleanId);
+      .eq('id', id);
       
-    if (error) throw error;
+    if (updateError) throw updateError;
     return newLikes;
   },
 
   async deletePrompt(id: string, userId: string): Promise<void> {
-    const cleanId = formatId(id);
-    console.debug(`[DB] Attempting to delete prompt ID: ${cleanId} for user: ${userId}`);
+    console.debug(`[DB] Attempting to delete prompt ID: ${id} for user: ${userId}`);
     
-    // Explicitly filter by both ID and user_id for security
+    // Explicitly filter by both ID (as string) and user_id for security
     const { error, count } = await supabase
       .from('prompts')
       .delete({ count: 'exact' })
-      .eq('id', cleanId)
+      .eq('id', id)
       .eq('user_id', userId);
     
     if (error) {
-      console.error("[DB] Supabase Delete Error:", error);
+      console.error("[DB] Supabase Delete Error:", error.message || error);
       throw error;
     }
 
     if (count === 0) {
-      console.warn("[DB] No rows deleted. Check ID type or ownership permissions.");
+      console.warn("[DB] No rows deleted. Check ownership permissions.");
     } else {
       console.debug(`[DB] Successfully deleted ${count} row(s).`);
     }
   },
 
   async updatePrompt(id: string, updates: Partial<SavedPrompt>, userId: string): Promise<void> {
-    const cleanId = formatId(id);
     const payload: any = {};
     if (updates.name) payload.name = updates.name;
     if (updates.text) payload.text = updates.text;
@@ -87,7 +78,7 @@ export const db = {
     const { error } = await supabase
       .from('prompts')
       .update(payload)
-      .eq('id', cleanId)
+      .eq('id', id)
       .eq('user_id', userId);
       
     if (error) throw error;
@@ -115,7 +106,7 @@ export const db = {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching user library:', error);
+      console.error('Error fetching user library:', error.message || error);
       return [];
     }
 
