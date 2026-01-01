@@ -313,7 +313,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col hero-gradient">
+    <div className="min-h-screen flex flex-col hero-gradient overflow-x-hidden">
       {loading && <LoadingOverlay message={loadingMsg} />}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <SaveModal isOpen={isSaving} onClose={() => setIsSaving(false)} tempName={tempSaveName} setTempName={setTempSaveName} onSave={saveToLibrary} />
@@ -322,11 +322,11 @@ export default function App() {
         user={user} onOpenAuth={() => setIsAuthOpen(true)} onSignOut={handleSignOut}
       />
 
-      <main className="pt-32 flex-1 px-6 md:px-12 max-w-7xl mx-auto w-full">
+      <main className="pt-24 md:pt-32 pb-44 md:pb-12 flex-1 px-6 md:px-12 max-w-7xl mx-auto w-full box-border">
         {mode === AppMode.HOME && <HomeHero setMode={setMode} />}
 
         {mode === AppMode.TRENDING_FEED && (
-          <div className="animate-in fade-in duration-700">
+          <div className="animate-in fade-in duration-700 w-full">
             <SectionHeading title="Community Canvas" subtitle="Global gallery of visual deconstructions." />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {trendingSortedPrompts.map((p) => (
@@ -362,10 +362,10 @@ export default function App() {
         )}
 
         {mode === AppMode.IMAGE_GEN && (
-          <div className="animate-in fade-in duration-700">
+          <div className="animate-in fade-in duration-700 w-full">
             <SectionHeading title="Construct" subtitle="Materialize worlds from pure data." />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="glass-panel p-8 rounded-[40px] space-y-8">
+              <div className="glass-panel p-8 rounded-[40px] space-y-8 w-full">
                 <textarea value={currentPrompt} onChange={(e) => setCurrentPrompt(e.target.value)} placeholder="Visual coordinates..." className="w-full h-40 bg-transparent text-xl serif italic resize-none focus:outline-none text-inherit" />
                 <div className="flex items-center justify-between">
                   <div className="flex gap-2">
@@ -380,7 +380,7 @@ export default function App() {
                   else setIsSaving(true);
                 }} className="w-full py-4 border border-zinc-500/10 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-inherit">Publish Result</button>}
               </div>
-              <div className="aspect-square relative group">
+              <div className="aspect-square relative group w-full">
                 {generatedImage ? (
                   <div className="w-full h-full rounded-[40px] overflow-hidden shadow-2xl relative bg-black">
                     <img src={generatedImage} className="w-full h-full object-cover" alt="Gen" />
@@ -413,7 +413,7 @@ export default function App() {
         )}
 
         {mode === AppMode.MY_LIBRARY && (
-          <div className="animate-in fade-in duration-700">
+          <div className="animate-in fade-in duration-700 w-full">
             <SectionHeading title="Private Archive" subtitle="Your local vault of visual DNA." />
             {!user ? (
                <div className="flex flex-col items-center justify-center py-20 glass-panel rounded-[40px] border-dashed border-2 border-zinc-500/20">
