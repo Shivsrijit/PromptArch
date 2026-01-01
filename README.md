@@ -2,16 +2,16 @@
 
 Prompt Architect is a high-fidelity AI studio designed to deconstruct, engineer, and remix visual aesthetics. Powered by Google's Gemini 3 models, it allows users to map the "visual DNA" of any image and apply it to their own photography with subject-locked precision.
 
-## 🏛️ Architecture Overview
+##  Architecture Overview
 
 The application follows a modular, state-driven React architecture designed for high performance and clean separation of concerns.
 
-### 🧩 Core Concepts
+###  Core Concepts
 - **Visual DNA**: The combination of prompt structures and visual markers (attributes) that define an image's aesthetic.
 - **Identity Anchoring**: A specialized prompting technique used in the Remix engine to ensure subjects (like people or celebrities) remain 100% recognizable while only the atmosphere shifts.
 - **Mode-Based Routing**: A lightweight state-driven router that handles transitions between Deconstruct, Construct, Remix, and Feed modes.
 
-### 📂 Modular Structure
+###  Modular Structure
 - `App.tsx`: The primary orchestrator handling global state, mode routing, and layout.
 - `components/`: A dedicated library of specific, reusable components.
   - `Navbar.tsx`: Unified navigation with theme and repository integration.
@@ -27,7 +27,7 @@ The application follows a modular, state-driven React architecture designed for 
 - `services/gemini.ts`: Encapsulated logic for all AI operations (Analysis, Generation, Editing).
 - `types.ts`: Centralized TypeScript interfaces for data consistency.
 
-## 🚀 How to Use
+##  How to Use
 
 ### 1. Deconstruct (Reverse Engineering)
 Upload any image that inspires you. The **Deconstruct** engine will analyze the image to extract a professional-grade prompt and specific visual markers (e.g., "Anamorphic Lens", "Golden Hour Lighting").
@@ -41,7 +41,7 @@ Upload a "Target Photo" (like a selfie). The **Remix** engine applies the DNA ma
 ### 4. Construct (Synthesis)
 Use engineered prompts to generate entirely new images in 1K, 2K, or 4K resolution.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 - **Frontend**: Vite + React + TypeScript
 - **Styling**: Tailwind CSS (with custom Glassmorphism and Variable Theme logic)
 - **AI Backend**: Google Gemini 3 (Pro, Flash, and Image Preview)
