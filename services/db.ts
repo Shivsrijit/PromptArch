@@ -2,6 +2,14 @@
 import { supabase } from './supabase';
 import { SavedPrompt, PublicPrompt } from "../types";
 
+// Helper to handle Supabase type strictness for IDs
+// If the ID is numeric (e.g. "12"), it converts to number. 
+// If it's a UUID (e.g. "abc-123"), it remains a string.
+const formatId = (id: string) => {
+  const numeric = Number(id);
+  return isNaN(numeric) ? id : numeric;
+};
+
 export const db = {
   async fetchCommunityPrompts(): Promise<PublicPrompt[]> {
     const { data, error } = await supabase
@@ -26,10 +34,12 @@ export const db = {
   },
 
   async toggleLikePrompt(id: string, increment: boolean): Promise<number> {
+    const cleanId = formatId(id);
+    
     const { data: existing } = await supabase
       .from('prompts')
       .select('likes')
-      .eq('id', id)
+      .eq('id', cleanId)
       .single();
 
     const currentLikes = existing?.likes || 0;
@@ -38,23 +48,37 @@ export const db = {
     const { error } = await supabase
       .from('prompts')
       .update({ likes: newLikes })
-      .eq('id', id);
+      .eq('id', cleanId);
       
     if (error) throw error;
     return newLikes;
   },
 
   async deletePrompt(id: string, userId: string): Promise<void> {
-    // We add user_id to the query to ensure you can only delete your own records
-    const { error } = await supabase
-      .from('prompts')
-      .delete()
-      .match({ id: id, user_id: userId });
+    const cleanId = formatId(id);
+    console.debug(`[DB] Attempting to delete prompt ID: ${cleanId} for user: ${userId}`);
     
-    if (error) throw error;
+    // Explicitly filter by both ID and user_id for security
+    const { error, count } = await supabase
+      .from('prompts')
+      .delete({ count: 'exact' })
+      .eq('id', cleanId)
+      .eq('user_id', userId);
+    
+    if (error) {
+      console.error("[DB] Supabase Delete Error:", error);
+      throw error;
+    }
+
+    if (count === 0) {
+      console.warn("[DB] No rows deleted. Check ID type or ownership permissions.");
+    } else {
+      console.debug(`[DB] Successfully deleted ${count} row(s).`);
+    }
   },
 
   async updatePrompt(id: string, updates: Partial<SavedPrompt>, userId: string): Promise<void> {
+    const cleanId = formatId(id);
     const payload: any = {};
     if (updates.name) payload.name = updates.name;
     if (updates.text) payload.text = updates.text;
@@ -63,7 +87,8 @@ export const db = {
     const { error } = await supabase
       .from('prompts')
       .update(payload)
-      .match({ id: id, user_id: userId });
+      .eq('id', cleanId)
+      .eq('user_id', userId);
       
     if (error) throw error;
   },
